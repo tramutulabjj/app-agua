@@ -21,7 +21,6 @@
             --input-bg: #f9f9f9;
         }
 
-        /* Cores do Modo Escuro */
         body.dark-mode {
             --primary-color: #5dade2;
             --bg-color: #1a1a2e;
@@ -60,7 +59,7 @@
             position: relative;
         }
 
-        /* Cabeçalho com botões de configuração */
+        /* Top Bar */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -135,7 +134,7 @@
 
         button.water-btn:active { transform: scale(0.95); }
 
-        /* Linha customizada: Input + Botão Desfazer */
+        /* Input Customizado e Botão Desfazer */
         .custom-row {
             display: flex;
             gap: 10px;
@@ -153,124 +152,86 @@
             outline: none;
         }
 
-        .custom-row button.add-btn {
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 0 15px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .custom-row button.add-btn { background-color: #2ecc71; color: white; border: none; border-radius: 10px; padding: 0 15px; font-weight: bold; cursor: pointer; }
+        .custom-row button.undo-btn { background-color: #95a5a6; color: white; border: none; border-radius: 10px; padding: 0 15px; font-weight: bold; cursor: pointer; }
 
-        .custom-row button.undo-btn {
-            background-color: #95a5a6;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 0 15px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-
-        /* Calendário Fixo de Segunda a Domingo */
+        /* Calendário da Semana */
         .history-section {
             border-top: 1px solid var(--border-color);
             padding-top: 20px;
         }
 
-        .history-title {
-            font-size: 14px;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .history-days {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .day-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 11px;
-            color: #7f8c8d;
-            text-transform: capitalize;
-            cursor: pointer;
-        }
-
-        .dot {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            margin-top: 5px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-            border: 2px solid transparent;
-        }
-
+        .history-title { font-size: 14px; color: #7f8c8d; margin-bottom: 15px; font-weight: bold; }
+        .history-days { display: flex; justify-content: space-between; align-items: center; }
+        
+        .day-card { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #7f8c8d; text-transform: capitalize; cursor: pointer; }
+        .dot { width: 22px; height: 22px; border-radius: 50%; margin-top: 5px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); border: 2px solid transparent; }
+        
         .dot.success { background-color: #2ecc71; }
         .dot.fail { background-color: #e74c3c; }
         .dot.empty { background-color: var(--border-color); }
         .dot.future { background-color: transparent; border: 2px dashed var(--border-color); box-shadow: none; }
         .dot.today { border: 2px solid var(--text-color); }
 
-        .day-info {
-            margin-top: 15px;
-            font-size: 14px;
-            color: var(--primary-color);
-            font-weight: bold;
-            min-height: 20px;
-        }
+        .day-info { margin-top: 15px; font-size: 14px; color: var(--primary-color); font-weight: bold; min-height: 20px; }
 
-        /* Modal de Configurações */
+        /* Botão para abrir o Calendário Mensal */
+        .btn-full-calendar {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-full-calendar:hover { background-color: var(--primary-color); color: white; }
+
+        /* Modais (Configuração e Calendário Mensal) */
         .modal {
-            display: none;
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0,0,0,0.6);
-            border-radius: 20px;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 100;
         }
 
         .modal-content {
-            background-color: var(--container-bg);
-            padding: 20px;
-            border-radius: 15px;
-            width: 80%;
-            text-align: center;
+            background-color: var(--container-bg); padding: 20px; border-radius: 15px; width: 90%; max-width: 380px; text-align: center; max-height: 90vh; overflow-y: auto;
         }
 
-        .modal-content input {
-            width: 100%;
-            padding: 10px;
-            margin: 15px 0;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            font-size: 16px;
-        }
-
-        .modal-buttons { display: flex; gap: 10px; }
-        .modal-buttons button {
-            flex: 1; padding: 10px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white;
-        }
+        .modal-content input { width: 100%; padding: 10px; margin: 15px 0; border-radius: 10px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); font-size: 16px; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 15px;}
+        .modal-buttons button { flex: 1; padding: 10px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; }
         .btn-save { background-color: var(--primary-color); }
         .btn-cancel { background-color: #e74c3c; }
+
+        /* Estilos do Calendário Mensal */
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .cal-header button { background: none; border: none; font-size: 20px; color: var(--primary-color); cursor: pointer; padding: 5px 15px; font-weight: bold;}
+        .cal-header h3 { text-transform: capitalize; margin: 0; font-size: 18px; }
+        
+        .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; font-size: 12px; color: #7f8c8d; font-weight: bold; margin-bottom: 5px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        
+        .cal-cell {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; color: #fff;
+        }
+        .cal-cell.empty-slot { background: transparent; cursor: default; }
+        .cal-cell.cal-success { background-color: #2ecc71; }
+        .cal-cell.cal-fail { background-color: #e74c3c; }
+        .cal-cell.cal-empty { background-color: var(--border-color); color: var(--text-color); }
+        .cal-cell.cal-future { background-color: transparent; border: 1px dashed var(--border-color); color: #7f8c8d; }
+        .cal-cell.cal-today { border: 2px solid var(--text-color); }
+
+        .modal-day-info { margin-top: 15px; padding: 10px; border-radius: 10px; background-color: var(--input-bg); font-weight: bold; color: var(--primary-color); min-height: 40px; }
 
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- Top Bar com Dark Mode e Engrenagem -->
+        <!-- Top Bar -->
         <div class="top-bar">
             <button class="icon-btn" onclick="toggleDarkMode()" id="dark-btn">🌙</button>
             <button class="icon-btn" onclick="openSettings()">⚙️</button>
@@ -294,25 +255,27 @@
             <button class="water-btn" onclick="addWater(1000)">+ 1 Litro 💧</button>
         </div>
 
-        <!-- Input Customizado e Botão Desfazer -->
         <div class="custom-row">
             <input type="number" id="custom-amount" placeholder="Outro valor (ml)">
             <button class="add-btn" onclick="addCustomWater()">➕</button>
             <button class="undo-btn" onclick="undoLast()" title="Desfazer">🔙</button>
         </div>
 
-        <!-- Calendário (Segunda a Domingo) -->
+        <!-- Histórico da Semana e Botão do Calendário Mensal -->
         <div class="history-section">
             <div class="history-title">Progresso da Semana</div>
             <div class="history-days" id="history-days"></div>
             <div id="day-info" class="day-info">Toque em um dia para ver os detalhes</div>
+            
+            <!-- Novo botão -->
+            <button class="btn-full-calendar" onclick="openCalendar()">📅 Ver Calendário Completo</button>
         </div>
 
-        <!-- Tela de Configuração (Modal) -->
+        <!-- Modal de Configurações -->
         <div class="modal" id="settings-modal">
             <div class="modal-content">
                 <h3>⚙️ Configurações</h3>
-                <p style="margin-top:10px; font-size:14px;">Defina sua meta diária de água (ml):</p>
+                <p style="margin-top:10px; font-size:14px;">Defina sua meta diária (ml):</p>
                 <input type="number" id="new-goal" placeholder="Ex: 4000">
                 <div class="modal-buttons">
                     <button class="btn-cancel" onclick="closeSettings()">Cancelar</button>
@@ -320,17 +283,45 @@
                 </div>
             </div>
         </div>
+
+        <!-- Novo Modal: Calendário Mensal -->
+        <div class="modal" id="calendar-modal">
+            <div class="modal-content">
+                <div class="cal-header">
+                    <button onclick="prevMonth()">❮</button>
+                    <h3 id="cal-month-year">Mês Ano</h3>
+                    <button onclick="nextMonth()">❯</button>
+                </div>
+                
+                <div class="cal-weekdays">
+                    <div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div><div>Dom</div>
+                </div>
+                
+                <div class="cal-grid" id="cal-grid">
+                    <!-- Dias gerados pelo JS -->
+                </div>
+
+                <div class="modal-day-info" id="modal-day-info">
+                    Toque em um dia acima para ver o consumo.
+                </div>
+
+                <button class="btn-cancel" style="width: 100%; margin-top: 15px; padding: 12px; border:none; border-radius:10px; font-weight:bold; color:white;" onclick="closeCalendar()">Fechar</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Variáveis Principais
         let goal = localStorage.getItem('waterGoal') ? parseInt(localStorage.getItem('waterGoal')) : 4000;
         let currentWater = 0;
         let history = {};
-        let actionHistory =[]; // Para o botão de desfazer
+        let actionHistory =[];
         let isDarkMode = localStorage.getItem('darkMode') === 'true';
 
-        // Sintetizador de Som (Água) - Cria o som sem precisar baixar MP3!
+        // Variáveis do Calendário Mensal
+        let navMonth = new Date().getMonth();
+        let navYear = new Date().getFullYear();
+
+        // Som de água
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playWaterSound() {
             if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -347,7 +338,6 @@
             oscillator.stop(audioCtx.currentTime + 0.1);
         }
 
-        // Aplicar Modo Escuro ao abrir
         if (isDarkMode) {
             document.body.classList.add('dark-mode');
             document.getElementById('dark-btn').innerText = '☀️';
@@ -372,10 +362,9 @@
                 currentWater = 0;
                 localStorage.setItem('waterDate', todayKey);
                 localStorage.setItem('waterIntake', 0);
-                actionHistory =[]; // Zera ações do dia
+                actionHistory =[]; 
             } else if (savedWater) {
                 currentWater = parseInt(savedWater);
-                // Carrega ações se houver
                 const savedActions = localStorage.getItem('actionHistory');
                 if(savedActions) actionHistory = JSON.parse(savedActions);
             }
@@ -398,17 +387,12 @@
             calculateStreak();
         }
 
-        // Calcula quantos dias seguidos bateu a meta
         function calculateStreak() {
             let streak = 0;
             let d = new Date();
             
-            // Verifica o dia de hoje primeiro
-            if (currentWater >= goal) {
-                streak++;
-            }
+            if (currentWater >= goal) streak++;
             
-            // Volta para ontem e começa a contar para trás
             d.setDate(d.getDate() - 1);
             while (true) {
                 let key = d.toDateString();
@@ -416,14 +400,12 @@
                     streak++;
                     d.setDate(d.getDate() - 1);
                 } else {
-                    break; // Se quebrou a corrente, para.
+                    break;
                 }
             }
-
             document.getElementById('streak').innerText = `🔥 ${streak} dias seguidos`;
         }
 
-        // Renderiza a semana fixa de Segunda a Domingo
         function renderWeek() {
             const historyDiv = document.getElementById('history-days');
             historyDiv.innerHTML = ''; 
@@ -431,8 +413,7 @@
             let curr = new Date();
             let todayKey = curr.toDateString();
             
-            // Descobre que dia é segunda-feira desta semana
-            let dayOfWeek = curr.getDay(); // 0 = Dom, 1 = Seg ... 6 = Sáb
+            let dayOfWeek = curr.getDay(); 
             let diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
             
             let monday = new Date(curr);
@@ -448,10 +429,8 @@
                 
                 let dayIntake = history[dateKey] || 0;
                 let isGoalMet = dayIntake >= goal;
-
                 let dotClass = 'empty';
                 
-                // Se a data do loop for no futuro
                 if (d.setHours(0,0,0,0) > new Date().setHours(0,0,0,0)) {
                     dotClass = 'future';
                 } else {
@@ -459,7 +438,6 @@
                     if (isGoalMet) dotClass = 'success';
                 }
                 
-                // Marca a bolinha de hoje
                 let todayBorder = dateKey === todayKey ? 'today' : '';
 
                 historyDiv.innerHTML += `
@@ -489,14 +467,12 @@
 
         function addWater(amount) {
             let wasBelowGoal = currentWater < goal;
-            
             currentWater += amount;
-            actionHistory.push(amount); // Salva para o botão desfazer
+            actionHistory.push(amount);
             
             saveState();
             playWaterSound();
 
-            // Se bateu a meta exatamente agora, solta confetes!
             if (wasBelowGoal && currentWater >= goal) {
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, zIndex: 1000 });
             }
@@ -507,17 +483,21 @@
             let amount = parseInt(input.value);
             if(amount > 0) {
                 addWater(amount);
-                input.value = ''; // Limpa o campo
+                input.value = ''; 
             }
         }
 
-        // Função de Desfazer
         function undoLast() {
             if(actionHistory.length > 0) {
                 let lastAmount = actionHistory.pop();
                 currentWater -= lastAmount;
                 if(currentWater < 0) currentWater = 0;
                 saveState();
+                
+                // Atualiza o calendário se ele estiver aberto
+                if(document.getElementById('calendar-modal').style.display === 'flex'){
+                    renderMonthCalendar();
+                }
             } else {
                 alert("Não há ações para desfazer hoje.");
             }
@@ -537,7 +517,6 @@
             showDayInfo(fullDateName, currentWater);
         }
 
-        // Configurações (Modal)
         function openSettings() {
             document.getElementById('settings-modal').style.display = 'flex';
             document.getElementById('new-goal').value = goal;
@@ -557,6 +536,102 @@
             }
         }
 
+        // --- FUNÇÕES DO CALENDÁRIO MENSAL ---
+        function openCalendar() {
+            document.getElementById('calendar-modal').style.display = 'flex';
+            // Abre sempre no mês atual
+            navMonth = new Date().getMonth();
+            navYear = new Date().getFullYear();
+            document.getElementById('modal-day-info').innerText = "Toque em um dia acima para ver o consumo.";
+            document.getElementById('modal-day-info').style.color = "var(--primary-color)";
+            renderMonthCalendar();
+        }
+
+        function closeCalendar() {
+            document.getElementById('calendar-modal').style.display = 'none';
+        }
+
+        function prevMonth() {
+            navMonth--;
+            if (navMonth < 0) { navMonth = 11; navYear--; }
+            renderMonthCalendar();
+        }
+
+        function nextMonth() {
+            navMonth++;
+            if (navMonth > 11) { navMonth = 0; navYear++; }
+            renderMonthCalendar();
+        }
+
+        function renderMonthCalendar() {
+            const grid = document.getElementById('cal-grid');
+            grid.innerHTML = '';
+            
+            const firstDayOfMonth = new Date(navYear, navMonth, 1);
+            const daysInMonth = new Date(navYear, navMonth + 1, 0).getDate();
+            
+            // Título do mês
+            let monthName = firstDayOfMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            document.getElementById('cal-month-year').innerText = monthName;
+
+            // Ajuste para começar na Segunda-feira (0 = Dom, 1 = Seg...)
+            let startDay = firstDayOfMonth.getDay();
+            let emptySlots = startDay === 0 ? 6 : startDay - 1;
+
+            // Preenche os espaços vazios antes do dia 1
+            for(let i = 0; i < emptySlots; i++) {
+                grid.innerHTML += `<div class="cal-cell empty-slot"></div>`;
+            }
+
+            let today = new Date();
+            today.setHours(0,0,0,0);
+
+            // Preenche os dias do mês
+            for(let i = 1; i <= daysInMonth; i++) {
+                let currentDay = new Date(navYear, navMonth, i);
+                let dateKey = currentDay.toDateString();
+                
+                let intake = history[dateKey] || 0;
+                let isGoalMet = intake >= goal;
+
+                let cellClass = 'cal-empty';
+                
+                if (currentDay > today) {
+                    cellClass = 'cal-future';
+                } else {
+                    if (intake > 0 && !isGoalMet) cellClass = 'cal-fail';
+                    if (isGoalMet) cellClass = 'cal-success';
+                }
+
+                let isToday = currentDay.getTime() === today.getTime() ? 'cal-today' : '';
+                
+                // Formata o nome para passar para a função ao clicar (ex: 15 de abril)
+                let fullDateName = currentDay.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' });
+
+                grid.innerHTML += `
+                    <div class="cal-cell ${cellClass} ${isToday}" onclick="showModalDayInfo('${fullDateName}', ${intake})">
+                        ${i}
+                    </div>
+                `;
+            }
+        }
+
+        function showModalDayInfo(dateName, intake) {
+            const infoDiv = document.getElementById('modal-day-info');
+            
+            if(intake === 0) {
+                infoDiv.innerText = `${dateName}: Nenhum registro.`;
+                infoDiv.style.color = '#7f8c8d';
+            } else if (intake >= goal) {
+                infoDiv.innerText = `🎉 ${dateName}: ${intake}ml (Meta batida!)`;
+                infoDiv.style.color = '#2ecc71';
+            } else {
+                infoDiv.innerText = `${dateName}: ${intake}ml consumidos.`;
+                infoDiv.style.color = '#e74c3c';
+            }
+        }
+
+        // Inicia o App
         loadData();
     </script>
 </body>
