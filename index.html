@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Água Diária</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --bg-color: #f0f4f8;
+            --container-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .progress-container {
+            background-color: #e0e0e0;
+            border-radius: 15px;
+            height: 30px;
+            width: 100%;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background-color: var(--primary-color);
+            height: 100%;
+            width: 0%;
+            border-radius: 15px;
+            transition: width 0.4s ease;
+        }
+
+        .stats {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .reset-btn {
+            background-color: #e74c3c;
+            width: 100%;
+        }
+
+        .reset-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>💧 Minha Água Diária</h1>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+        
+        <div class="stats">
+            <span id="current">0</span> ml / <span id="goal">2000</span> ml
+        </div>
+
+        <div class="buttons">
+            <button onclick="addWater(250)">+ 250ml 🚰</button>
+            <button onclick="addWater(500)">+ 500ml 🥤</button>
+        </div>
+
+        <button class="reset-btn" onclick="resetWater()">🔄 Zerar Contador</button>
+    </div>
+
+    <script>
+        // Configurações Iniciais
+        const goal = 2000; // Meta de 2 litros (2000 ml)
+        let currentWater = 0;
+
+        // Função para carregar os dados salvos no navegador (LocalStorage)
+        function loadData() {
+            const savedWater = localStorage.getItem('waterIntake');
+            const savedDate = localStorage.getItem('waterDate');
+            const today = new Date().toDateString();
+
+            // Se for um novo dia, a água zera automaticamente
+            if (savedDate !== today) {
+                currentWater = 0;
+                localStorage.setItem('waterDate', today);
+                localStorage.setItem('waterIntake', 0);
+            } else if (savedWater) {
+                currentWater = parseInt(savedWater);
+            }
+            
+            updateUI();
+        }
+
+        // Atualiza a tela (textos e barra de progresso)
+        function updateUI() {
+            document.getElementById('current').innerText = currentWater;
+            
+            let percentage = (currentWater / goal) * 100;
+            if (percentage > 100) percentage = 100; // Trava a barra em 100%
+            
+            document.getElementById('progress').style.width = percentage + '%';
+        }
+
+        // Adiciona água
+        function addWater(amount) {
+            currentWater += amount;
+            localStorage.setItem('waterIntake', currentWater);
+            updateUI();
+        }
+
+        // Zera o contador manualmente
+        function resetWater() {
+            if(confirm('Tem certeza que deseja zerar a contagem de hoje?')) {
+                currentWater = 0;
+                localStorage.setItem('waterIntake', currentWater);
+                updateUI();
+            }
+        }
+
+        // Inicia o app carregando os dados
+        loadData();
+    </script>
+
+</body>
+</html>
