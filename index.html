@@ -25,7 +25,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            padding: 20px 0;
         }
 
         .container {
@@ -67,10 +68,11 @@
             margin-bottom: 25px;
         }
 
+        /* --- Mudança para caber mais botões --- */
         .buttons {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: 1fr 1fr; /* 2 colunas */
+            gap: 12px;
             margin-bottom: 20px;
         }
 
@@ -78,11 +80,12 @@
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, transform 0.1s;
         }
 
         button:hover {
@@ -90,29 +93,31 @@
         }
 
         button:active {
-            transform: scale(0.98);
+            transform: scale(0.95);
         }
 
         .reset-btn {
             background-color: #e74c3c;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            padding: 15px;
         }
 
         .reset-btn:hover {
             background-color: #c0392b;
         }
 
-        /* --- Estilos Novos do Calendário --- */
+        /* --- Estilos do Calendário --- */
         .history-section {
             border-top: 1px solid #eee;
-            padding-top: 15px;
+            padding-top: 20px;
         }
 
         .history-title {
             font-size: 14px;
             color: #7f8c8d;
             margin-bottom: 15px;
+            font-weight: bold;
         }
 
         .history-days {
@@ -121,6 +126,7 @@
             align-items: center;
         }
 
+        /* Mudança para deixar o dia clicável */
         .day-card {
             display: flex;
             flex-direction: column;
@@ -128,21 +134,34 @@
             font-size: 12px;
             color: #7f8c8d;
             text-transform: capitalize;
+            cursor: pointer; /* Muda o mouse para uma mãozinha */
+            transition: transform 0.2s;
+        }
+
+        .day-card:hover {
+            transform: scale(1.1); /* Dá um pequeno zoom ao passar o mouse */
         }
 
         .dot {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             margin-top: 8px;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .dot.success { background-color: #2ecc71; } /* Verde - Bateu a meta */
-        .dot.fail { background-color: #e74c3c; }    /* Vermelho - Não bateu */
-        .dot.empty { background-color: #bdc3c7; }   /* Cinza - Vazio/Zero */
-        /* ----------------------------------- */
+        .dot.success { background-color: #2ecc71; }
+        .dot.fail { background-color: #e74c3c; }
+        .dot.empty { background-color: #bdc3c7; }
 
+        /* Nova área de texto para mostrar quanto bebeu no dia clicado */
+        .day-info {
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--primary-color);
+            font-weight: bold;
+            min-height: 20px; /* Mantém o espaço mesmo vazio */
+        }
     </style>
 </head>
 <body>
@@ -158,27 +177,30 @@
             <span id="current">0</span> ml / <span id="goal">4000</span> ml
         </div>
 
+        <!-- Agora temos 4 opções de botões! -->
         <div class="buttons">
-            <button onclick="addWater(250)">+ 250ml 🚰</button>
+            <button onclick="addWater(150)">+ 150ml ☕</button>
+            <button onclick="addWater(250)">+ 250ml 🥛</button>
             <button onclick="addWater(500)">+ 500ml 🥤</button>
+            <button onclick="addWater(1000)">+ 1 Litro 💧</button>
         </div>
 
         <button class="reset-btn" onclick="resetWater()">🔄 Zerar Contador de Hoje</button>
 
-        <!-- Nova seção do Histórico -->
         <div class="history-section">
             <div class="history-title">Histórico dos últimos 7 dias</div>
             <div class="history-days" id="history-days">
                 <!-- Os dias vão aparecer aqui via JavaScript -->
             </div>
+            <!-- Aqui vai aparecer a mensagem quando você clicar na bolinha -->
+            <div id="day-info" class="day-info">Toque em uma bolinha para ver os detalhes</div>
         </div>
     </div>
 
     <script>
-        // Configurações
-        const goal = 4000; // Sua meta de 4 litros
+        const goal = 4000;
         let currentWater = 0;
-        let history = {}; // Vai guardar o histórico de todos os dias
+        let history = {};
 
         function loadData() {
             const savedWater = localStorage.getItem('waterIntake');
@@ -186,12 +208,10 @@
             const savedHistory = localStorage.getItem('waterHistory');
             const todayKey = new Date().toDateString();
 
-            // Carrega o histórico salvo (se existir)
             if (savedHistory) {
                 history = JSON.parse(savedHistory);
             }
 
-            // Se for um novo dia, a água de hoje zera
             if (savedDate !== todayKey) {
                 currentWater = 0;
                 localStorage.setItem('waterDate', todayKey);
@@ -200,7 +220,6 @@
                 currentWater = parseInt(savedWater);
             }
             
-            // Garante que o dia de hoje já esteja no histórico
             history[todayKey] = currentWater;
             localStorage.setItem('waterHistory', JSON.stringify(history));
 
@@ -208,7 +227,6 @@
         }
 
         function updateUI() {
-            // Atualiza os textos e a barra
             document.getElementById('current').innerText = currentWater;
             
             let percentage = (currentWater / goal) * 100;
@@ -216,34 +234,33 @@
             
             document.getElementById('progress').style.width = percentage + '%';
 
-            // Atualiza o calendário (Histórico)
             renderHistory();
         }
 
         function renderHistory() {
             const historyDiv = document.getElementById('history-days');
-            historyDiv.innerHTML = ''; // Limpa para desenhar de novo
+            historyDiv.innerHTML = ''; 
 
-            // Cria os últimos 7 dias
             for(let i = 6; i >= 0; i--) {
                 let d = new Date();
                 d.setDate(d.getDate() - i);
                 
                 let dateKey = d.toDateString();
-                // Pega o nome do dia da semana (seg, ter, qua...)
                 let dayName = d.toLocaleDateString('pt-BR', {weekday: 'short'}).substring(0,3);
+                
+                // Formata o dia para aparecer bonito ao clicar (ex: Sexta-feira, 15)
+                let fullDateName = d.toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric'});
 
                 let dayIntake = history[dateKey] || 0;
                 let isGoalMet = dayIntake >= goal;
 
-                // Define a cor da bolinha
-                let dotClass = 'empty'; // Cinza (Padrão)
-                if (dayIntake > 0 && !isGoalMet) dotClass = 'fail'; // Vermelho (Começou mas não terminou)
-                if (isGoalMet) dotClass = 'success'; // Verde (Bateu a meta!)
+                let dotClass = 'empty';
+                if (dayIntake > 0 && !isGoalMet) dotClass = 'fail';
+                if (isGoalMet) dotClass = 'success';
 
-                // Adiciona a bolinha na tela
+                // Adiciona a função de clique (onclick) no dia
                 historyDiv.innerHTML += `
-                    <div class="day-card">
+                    <div class="day-card" onclick="showDayInfo('${fullDateName}', ${dayIntake})">
                         <span>${dayName}</span>
                         <div class="dot ${dotClass}"></div>
                     </div>
@@ -251,16 +268,38 @@
             }
         }
 
+        // Nova função: Mostra na tela o quanto bebeu no dia selecionado
+        function showDayInfo(dateName, intake) {
+            const infoDiv = document.getElementById('day-info');
+            // Deixa a primeira letra maiúscula
+            const formattedDate = dateName.charAt(0).toUpperCase() + dateName.slice(1);
+            
+            if(intake === 0) {
+                infoDiv.innerText = `${formattedDate}: Nenhum registro.`;
+                infoDiv.style.color = '#7f8c8d'; // Cinza
+            } else if (intake >= goal) {
+                infoDiv.innerText = `🎉 ${formattedDate}: ${intake}ml (Meta batida!)`;
+                infoDiv.style.color = '#2ecc71'; // Verde
+            } else {
+                infoDiv.innerText = `${formattedDate}: ${intake}ml consumidos.`;
+                infoDiv.style.color = '#e74c3c'; // Vermelho
+            }
+        }
+
         function addWater(amount) {
             currentWater += amount;
             localStorage.setItem('waterIntake', currentWater);
             
-            // Salva no histórico de hoje
             let todayKey = new Date().toDateString();
             history[todayKey] = currentWater;
             localStorage.setItem('waterHistory', JSON.stringify(history));
 
             updateUI();
+            
+            // Se clicar pra adicionar água, atualiza a mensagem lá de baixo pro dia de hoje
+            let d = new Date();
+            let fullDateName = d.toLocaleDateString('pt-BR', {weekday: 'long', day: 'numeric'});
+            showDayInfo(fullDateName, currentWater);
         }
 
         function resetWater() {
@@ -268,16 +307,18 @@
                 currentWater = 0;
                 localStorage.setItem('waterIntake', currentWater);
                 
-                // Zera no histórico de hoje também
                 let todayKey = new Date().toDateString();
                 history[todayKey] = 0;
                 localStorage.setItem('waterHistory', JSON.stringify(history));
 
                 updateUI();
+                
+                // Reseta a mensagem de baixo
+                document.getElementById('day-info').innerText = "Toque em uma bolinha para ver os detalhes";
+                document.getElementById('day-info').style.color = "var(--primary-color)";
             }
         }
 
-        // Inicia o app
         loadData();
     </script>
 
