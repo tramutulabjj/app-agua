@@ -145,11 +145,22 @@
         db.collection("users").doc(userId).set({ logs, goal });
     }
 
-    function salvarMeta() {
-        const novoGoal = document.getElementById('input-meta').value;
-        if(novoGoal) goal = parseInt(novoGoal);
+   function salvarMeta() {
+        const inputMeta = document.getElementById('input-meta').value;
+        const metaSugerida = document.getElementById('sugestao').innerText;
+        
+        // Se o usuário digitou algo no manual, usa, senão usa a sugestão
+        goal = parseInt(inputMeta || metaSugerida);
+        
         document.getElementById('modal').style.display = 'none';
-        salvarNoFirebase();
+        
+        // Agora sim: salva no Firebase a meta atualizada!
+        db.collection("users").doc(userId).set({ 
+            logs: logs, 
+            goal: goal 
+        }).then(() => {
+            atualizarUI(); // Garante que a barra e o texto atualizem depois de salvar
+        });
     }
 
     function atualizarUI() {
