@@ -145,22 +145,33 @@
         db.collection("users").doc(userId).set({ logs, goal });
     }
 
-   function salvarMeta() {
+  async function salvarMeta() {
+        // Pega o valor do input manual ou da sugestão
         const inputMeta = document.getElementById('input-meta').value;
         const metaSugerida = document.getElementById('sugestao').innerText;
         
-        // Se o usuário digitou algo no manual, usa, senão usa a sugestão
+        // Define a meta na variável local
         goal = parseInt(inputMeta || metaSugerida);
         
+        // Fecha o modal
         document.getElementById('modal').style.display = 'none';
-        
-        // Agora sim: salva no Firebase a meta atualizada!
-        db.collection("users").doc(userId).set({ 
-            logs: logs, 
-            goal: goal 
-        }).then(() => {
-            atualizarUI(); // Garante que a barra e o texto atualizem depois de salvar
-        });
+
+        // SALVA TUDO NO FIREBASE AGORA
+        try {
+            await db.collection("users").doc(userId).set({ 
+                logs: logs, 
+                goal: goal 
+            }, { merge: true }); // O 'merge: true' é importante para não apagar seus logs!
+            
+            console.log("Meta salva com sucesso!");
+            
+            // Força a atualização da interface
+            atualizarUI();
+            
+        } catch (error) {
+            console.error("Erro ao salvar no Firebase: ", error);
+            alert("Erro ao salvar a meta. Verifique sua conexão.");
+        }
     }
 
     function atualizarUI() {
