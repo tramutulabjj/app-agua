@@ -4,99 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Água Diária</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
-        :root { --primary-color: #3498db; --bg-color: #f0f4f8; --container-bg: #ffffff; --text-color: #333; --border-color: #eee; }
-        body.dark-mode { --primary-color: #5dade2; --bg-color: #1a1a2e; --container-bg: #16213e; --text-color: #e9e9e9; --border-color: #2c3e50; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px 0; }
-        .container { background-color: var(--container-bg); padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
-        
-        /* Gráfico de Barras */
-        .chart-container { display: flex; align-items: flex-end; justify-content: space-around; height: 100px; margin: 20px 0; border-bottom: 2px solid var(--border-color); }
-        .bar-col { display: flex; flex-direction: column; align-items: center; width: 30px; }
-        .bar { width: 100%; background-color: var(--primary-color); border-radius: 5px 5px 0 0; transition: height 0.5s; }
-        .bar-label { font-size: 10px; margin-top: 5px; }
 
-        /* Lista de Horários */
-        .logs { margin-top: 20px; font-size: 13px; text-align: left; background: var(--border-color); padding: 10px; border-radius: 10px; max-height: 150px; overflow-y: auto; }
-        
-        button { cursor: pointer; padding: 10px; border: none; border-radius: 8px; color: white; background: var(--primary-color); font-weight: bold; }
-        .modal { display: none; position: fixed; top:0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { background: var(--container-bg); padding: 20px; border-radius: 15px; width: 80%; }
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAhMHXKPknVmLv02EBLqG7E-f7Eekv2ghw",
+            authDomain: "app-agua-2.firebaseapp.com",
+            projectId: "app-agua-2",
+            storageBucket: "app-agua-2.firebasestorage.app",
+            messagingSenderId: "1087972192648",
+            appId: "1:1087972192648:web:de80b2e1e32643c71e4a3d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        let userId = localStorage.getItem('uniqueUserId') || 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('uniqueUserId', userId);
+    </script>
+
+    <style>
+        :root { --primary-color: #5dade2; --bg-color: #1a1a2e; --container-bg: #16213e; --text-color: #e9e9e9; --border-color: #2c3e50; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; padding: 20px; min-height: 100vh; }
+        .container { background-color: var(--container-bg); padding: 20px; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .chart-box { display: flex; align-items: flex-end; justify-content: space-around; height: 80px; margin: 15px 0; border-bottom: 2px solid var(--border-color); padding-bottom: 5px; }
+        .bar { width: 30px; background: var(--primary-color); border-radius: 5px 5px 0 0; transition: height 0.5s; }
+        .log-list { font-size: 12px; margin: 10px 0; max-height: 100px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; }
+        button { padding: 10px; border: none; border-radius: 8px; background: var(--primary-color); color: white; font-weight: bold; cursor: pointer; }
+        .modal { display: none; position: fixed; top:0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
+        .modal-content { background: var(--container-bg); padding: 20px; border-radius: 15px; width: 90%; max-width: 350px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #444; background: #2c3e50; color: white; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>💧 Minha Água</h1>
-    <div id="progress-container" style="height:20px; background:#ddd; border-radius:10px; margin:10px 0;"><div id="bar" style="height:100%; width:0%; background:var(--primary-color); border-radius:10px;"></div></div>
-    <h2 id="stats">0 / 4000 ml</h2>
-    
-    <div class="chart-container" id="chart"></div>
-    
-    <div class="buttons" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-        <button onclick="addWater(250)">+ 250ml</button>
-        <button onclick="addWater(500)">+ 500ml</button>
+    <div id="progresso-bar" style="height:20px; background:#444; border-radius:10px; margin:10px 0;"><div id="bar" style="height:100%; width:0%; background:var(--primary-color); border-radius:10px;"></div></div>
+    <h2 id="display-meta">0 / 4000 ml</h2>
+
+    <div class="chart-box" id="chart"></div>
+    <div class="log-list" id="logs">Histórico de hoje:</div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">
+        <button onclick="addWater(150)">+150ml</button>
+        <button onclick="addWater(250)">+250ml</button>
+        <button onclick="addWater(500)">+500ml</button>
+        <button onclick="addWater(1000)">+1L</button>
+        <button style="grid-column: span 2; background:#e74c3c;" onclick="undoLast()">🔙 Desfazer Última</button>
     </div>
-    
-    <div class="logs" id="logs">Histórico de hoje:</div>
-    <button style="margin-top:15px; width:100%;" onclick="document.getElementById('modal').style.display='flex'">⚙️ Configurar Meta</button>
+
+    <button style="width:100%; margin-top:10px;" onclick="document.getElementById('modal').style.display='flex'">⚙️ Configurar Meta</button>
 </div>
 
 <div class="modal" id="modal">
     <div class="modal-content">
         <h3>Meta Diária</h3>
-        <input type="number" id="weight" placeholder="Seu peso (kg)" oninput="calcMeta()">
-        <p style="margin:10px 0;">Meta Sugerida: <span id="meta-sugestao">0</span>ml</p>
-        <input type="number" id="final-goal" placeholder="Definir meta final">
-        <button onclick="saveGoal()">Salvar</button>
+        <input type="number" id="input-peso" placeholder="Seu peso (kg)" oninput="sugerirMeta()">
+        <p>Meta sugerida: <b id="sugestao">0</b>ml</p>
+        <input type="number" id="input-meta" placeholder="Meta manual">
+        <button onclick="salvarMeta()">Salvar</button>
     </div>
 </div>
 
 <script>
     let goal = parseInt(localStorage.getItem('goal')) || 4000;
-    let waterLog = JSON.parse(localStorage.getItem('waterLog')) || [];
+    let logs = [];
+
+    // Carrega do Firebase na inicialização
+    db.collection("users").doc(userId).get().then((doc) => {
+        if (doc.exists) {
+            logs = doc.data().logs || [];
+            goal = doc.data().goal || goal;
+        }
+        atualizarUI();
+    });
 
     function addWater(ml) {
-        const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        waterLog.push({ml, time, date: new Date().toDateString()});
-        localStorage.setItem('waterLog', JSON.stringify(waterLog));
-        updateUI();
-        if(getTotalToday() >= goal) confetti();
+        const agora = new Date();
+        logs.push({ ml, time: agora.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), date: agora.toDateString() });
+        salvarNoFirebase();
+        if(getTotal() >= goal) confetti();
     }
 
-    function getTotalToday() {
-        return waterLog.filter(x => x.date === new Date().toDateString()).reduce((a,b) => a + b.ml, 0);
+    function undoLast() {
+        logs.pop();
+        salvarNoFirebase();
     }
 
-    function calcMeta() {
-        const weight = document.getElementById('weight').value;
-        document.getElementById('meta-sugestao').innerText = weight * 35;
+    function getTotal() {
+        return logs.filter(x => x.date === new Date().toDateString()).reduce((a,b) => a + b.ml, 0);
     }
 
-    function saveGoal() {
-        goal = document.getElementById('final-goal').value;
-        localStorage.setItem('goal', goal);
+    function salvarNoFirebase() {
+        db.collection("users").doc(userId).set({ logs, goal });
+        atualizarUI();
+    }
+
+    function salvarMeta() {
+        goal = document.getElementById('input-meta').value || document.getElementById('sugestao').innerText;
         document.getElementById('modal').style.display = 'none';
-        updateUI();
+        salvarNoFirebase();
     }
 
-    function updateUI() {
-        const today = getTotalToday();
-        document.getElementById('stats').innerText = `${today} / ${goal} ml`;
-        document.getElementById('bar').style.width = Math.min((today/goal)*100, 100) + '%';
-        
-        // Atualizar lista de horários
-        const logsDiv = document.getElementById('logs');
-        logsDiv.innerHTML = waterLog.filter(x => x.date === new Date().toDateString()).map(x => `<div>${x.time} - ${x.ml}ml</div>`).join('');
-        
-        // Atualizar Gráfico (Simplificado)
-        const chart = document.getElementById('chart');
-        chart.innerHTML = `<div class="bar-col"><div class="bar" style="height:${(today/goal)*100}%"></div><div class="bar-label">Hoje</div></div>`;
+    function atualizarUI() {
+        const total = getTotal();
+        document.getElementById('display-meta').innerText = `${total} / ${goal} ml`;
+        document.getElementById('bar').style.width = Math.min((total/goal)*100, 100) + '%';
+        document.getElementById('logs').innerHTML = logs.filter(x => x.date === new Date().toDateString()).map(x => `<div>${x.time} - ${x.ml}ml</div>`).join('');
+        document.getElementById('chart').innerHTML = `<div class="bar" style="height:${Math.min((total/goal)*100, 100)}%"></div>`;
     }
 
-    updateUI();
+    function sugerirMeta() {
+        document.getElementById('sugestao').innerText = document.getElementById('input-peso').value * 35;
+    }
 </script>
 </body>
 </html>
