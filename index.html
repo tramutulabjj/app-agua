@@ -96,13 +96,14 @@
         auth.signInWithPopup(provider);
     }
 
-    function carregarDados() {
-        db.collection("users").doc(userId).get().then((doc) => {
+   function carregarDados() {
+        // Usamos o onSnapshot para monitorar mudanças em tempo real
+        db.collection("users").doc(userId).onSnapshot((doc) => {
             if (doc.exists) {
                 logs = doc.data().logs || [];
                 goal = doc.data().goal || 4000;
+                atualizarUI();
             }
-            atualizarUI();
         });
     }
 
