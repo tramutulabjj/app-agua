@@ -84,7 +84,7 @@
             userId = user.uid;
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
-            carregarDados();
+            monitorarDados();
         } else {
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('app-container').style.display = 'none';
@@ -96,13 +96,16 @@
         auth.signInWithPopup(provider);
     }
 
-   function carregarDados() {
-        // Usamos o onSnapshot para monitorar mudanças em tempo real
+    function monitorarDados() {
+        // Usa onSnapshot para escutar em tempo real (se o PC mudar, o celular vê)
         db.collection("users").doc(userId).onSnapshot((doc) => {
             if (doc.exists) {
                 logs = doc.data().logs || [];
                 goal = doc.data().goal || 4000;
                 atualizarUI();
+            } else {
+                // Cria documento se não existir
+                db.collection("users").doc(userId).set({ logs: [], goal: 4000 });
             }
         });
     }
@@ -125,7 +128,6 @@
 
     function salvarNoFirebase() {
         db.collection("users").doc(userId).set({ logs, goal });
-        atualizarUI();
     }
 
     function salvarMeta() {
