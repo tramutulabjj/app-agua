@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Água</title>
-    <!-- Ícone -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💧</text></svg>">
-    <link rel="manifest" href="manifest.json">
-    
+    <!-- ... (Mantenha os links do Firebase, Manifest e Scripts de cima) ... -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -18,29 +15,20 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; padding: 10px; min-height: 100vh; }
         .container { background-color: var(--container-bg); padding: 20px; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: none; }
-        
-        /* Login Ajustado */
-        #login-screen { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        .login-box { background: var(--container-bg); padding: 40px; border-radius: 20px; text-align: center; }
-        
-        /* Modal e Botões */
         .modal { display: none; position: fixed; top:0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 100; }
         .modal-content { background: var(--container-bg); padding: 20px; border-radius: 15px; width: 95%; max-width: 350px; }
         button { padding: 12px; border: none; border-radius: 8px; background: var(--primary-color); color: white; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-        .btn-x { background: #e74c3c; padding: 5px 10px; border-radius: 5px; cursor: pointer; float: right; }
-        
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
         .day-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: #2c3e50; border-radius: 5px; font-size: 10px; cursor: pointer; }
         .day-cell.done { background: #2ecc71; }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
-    <div class="login-box">
-        <h1>💧 Minha Água</h1>
-        <button style="width: 200px;" onclick="auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())">Entrar com Google</button>
-    </div>
+<div id="login-screen" style="display:none; text-align:center; padding-top:20vh;">
+    <h1>💧 Minha Água</h1>
+    <button style="width:200px;" onclick="auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())">Entrar com Google</button>
 </div>
 
 <div class="container" id="app-container">
@@ -57,23 +45,25 @@
         <button onclick="addWater(500)">+500ml</button><button onclick="addWater(1000)">+1L</button>
         <button style="grid-column: span 2; background:#e74c3c;" onclick="undoLast()">🔙 Desfazer</button>
     </div>
-
-    <button style="margin-top:10px;" onclick="document.getElementById('modal-meta').style.display='flex'">⚙️ Configurar Meta</button>
-    <button style="margin-top:10px; background:#2ecc71;" onclick="openCalendar()">📅 Calendário Mensal</button>
+    <button onclick="document.getElementById('modal-meta').style.display='flex'">⚙️ Configurar Meta</button>
+    <button style="background:#2ecc71;" onclick="openCalendar()">📅 Calendário Mensal</button>
 </div>
 
+<!-- Modais -->
 <div id="modal-meta" class="modal"><div class="modal-content">
-    <span class="btn-x" onclick="document.getElementById('modal-meta').style.display='none'">X</span>
     <h3>Configurar Meta</h3>
-    <input type="number" id="input-peso" placeholder="Peso (kg)" oninput="sugerir()">
+    <input type="number" id="input-peso" placeholder="Peso (kg)" oninput="document.getElementById('sugestao').innerText = this.value * 35">
     <p>Meta sugerida: <b id="sugestao">0</b>ml</p>
-    <input type="number" id="input-meta" placeholder="Manual (ml)">
+    <input type="number" id="input-meta" placeholder="Meta manual (ml)">
     <button onclick="salvarMeta()">Salvar</button>
 </div></div>
 
 <div id="modal-cal" class="modal"><div class="modal-content">
-    <span class="btn-x" onclick="document.getElementById('modal-cal').style.display='none'">X</span>
-    <h3>Calendário</h3>
+    <div class="cal-header">
+        <button style="width:auto;" onclick="changeMonth(-1)">❮</button>
+        <h3 id="mes-titulo">Mês</h3>
+        <button style="width:auto;" onclick="changeMonth(1)">❯</button>
+    </div>
     <div class="cal-grid" id="calendar-grid"></div>
     <div id="day-details" style="margin-top:15px; font-size:12px;"></div>
 </div></div>
@@ -82,51 +72,50 @@
     const firebaseConfig = { apiKey: "AIzaSyAhMHXKPknVmLv02EBLqG7E-f7Eekv2ghw", authDomain: "app-agua-2.firebaseapp.com", projectId: "app-agua-2", storageBucket: "app-agua-2.firebasestorage.app", messagingSenderId: "1087972192648", appId: "1:1087972192648:web:de80b2e1e32643c71e4a3d" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore(), auth = firebase.auth();
+
     let goal = 4000, logs = [], userId = null;
+    let viewDate = new Date(); // Data do mês que estamos olhando
 
     auth.onAuthStateChanged(user => {
         if (user) { userId = user.uid; document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-container').style.display = 'block'; monitorarDados(); }
         else { document.getElementById('login-screen').style.display = 'flex'; document.getElementById('app-container').style.display = 'none'; }
     });
 
-    function monitorarDados() {
-        db.collection("users").doc(userId).onSnapshot(doc => {
-            if (doc.exists) { logs = doc.data().logs || []; goal = doc.data().goal || 4000; }
-            atualizarUI();
-        });
-    }
-
-    function addWater(ml) {
-        logs.push({ ml, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), date: new Date().toDateString() });
-        db.collection("users").doc(userId).set({ logs, goal });
-        if(logs.filter(x => x.date === new Date().toDateString()).reduce((a,b)=>a+b.ml,0) >= goal) confetti();
-    }
-
+    function monitorarDados() { db.collection("users").doc(userId).onSnapshot(doc => { if (doc.exists) { logs = doc.data().logs || []; goal = doc.data().goal || 4000; } atualizarUI(); }); }
+    function addWater(ml) { logs.push({ ml, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), date: new Date().toDateString() }); db.collection("users").doc(userId).set({ logs, goal }); if(logs.filter(x => x.date === new Date().toDateString()).reduce((a,b)=>a+b.ml,0) >= goal) confetti(); }
     function undoLast() { logs.pop(); db.collection("users").doc(userId).set({ logs, goal }); }
     function salvarMeta() { goal = parseInt(document.getElementById('input-meta').value) || parseInt(document.getElementById('sugestao').innerText); db.collection("users").doc(userId).set({ logs, goal }); document.getElementById('modal-meta').style.display = 'none'; }
-    function sugerir() { document.getElementById('sugestao').innerText = document.getElementById('input-peso').value * 35; }
+
+    function changeMonth(delta) { viewDate.setMonth(viewDate.getMonth() + delta); openCalendar(); }
 
     function openCalendar() {
         document.getElementById('modal-cal').style.display = 'flex';
         const grid = document.getElementById('calendar-grid'); grid.innerHTML = '';
-        let dias = [];
-        for(let i=29; i>=0; i--) { let d = new Date(); d.setDate(d.getDate() - i); dias.push(d); } // Ordenado crescente
-        dias.forEach(d => {
+        const year = viewDate.getFullYear(), month = viewDate.getMonth();
+        document.getElementById('mes-titulo').innerText = viewDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
+        for(let day=1; day<=daysInMonth; day++) {
+            let d = new Date(year, month, day);
             let dateStr = d.toDateString();
             let total = logs.filter(x => x.date === dateStr).reduce((a,b) => a+b.ml, 0);
             let div = document.createElement('div');
             div.className = 'day-cell ' + (total >= goal ? 'done' : '');
-            div.innerText = d.getDate();
+            div.innerText = day;
             div.onclick = () => document.getElementById('day-details').innerHTML = `<b>${dateStr}</b><br>` + (logs.filter(x => x.date === dateStr).map(x => `<div>${x.time} - ${x.ml}ml</div>`).join('') || "Sem registros");
             grid.appendChild(div);
-        });
+        }
     }
 
     function atualizarUI() {
-        const total = logs.filter(x => x.date === new Date().toDateString()).reduce((a,b) => a + b.ml, 0);
+        const today = new Date().toDateString();
+        const total = logs.filter(x => x.date === today).reduce((a,b) => a + b.ml, 0);
         document.getElementById('display-meta').innerText = `${total} / ${goal} ml`;
         document.getElementById('bar').style.width = Math.min((total/goal)*100, 100) + '%';
-        document.getElementById('logs').innerHTML = logs.filter(x => x.date === new Date().toDateString()).map(x => `<div>${x.time} - ${x.ml}ml</div>`).join('') || "Sem registros hoje.";
+        document.getElementById('logs').innerHTML = logs.filter(x => x.date === today).map(x => `<div>${x.time} - ${x.ml}ml</div>`).join('') || "Sem registros hoje.";
     }
 </script>
 </body>
